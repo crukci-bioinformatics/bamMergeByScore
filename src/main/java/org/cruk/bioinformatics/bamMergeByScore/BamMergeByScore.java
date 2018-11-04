@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
@@ -26,18 +27,24 @@ import org.apache.logging.log4j.Logger;
 public class BamMergeByScore {
   protected Logger log = LogManager.getLogger(BamMergeByScore.class);
   protected Options options = new Options();
+  protected CommandLine cli = null;
+  protected List<String> inputs = null;
 
   protected void configureOptions() {
+    OptionGroup og = new OptionGroup();
+    og.setRequired(true);
     Option o;
-    o = new Option("-o", "--output", true, "merge output into one file (named)");
+    o = new Option("o", "output", true, "merge output into one file (named)");
     o.setType(File.class);
-    options.addOption(o);
-    o = new Option("-s", "--split", false, "keep output in separate files, named based on input");
-    options.addOption(o);
+    og.addOption(o);
+    o = new Option("s", "split", false, "keep output in separate files, named based on input");
+    og.addOption(o);
+    options.addOptionGroup(og);
   }
 
   /**
-   * Parse the command line, check for at least one input file. Op
+   * Parse the command line, check for at least one input file. Options "--output"
+   * and "--split" are mutually exclusive.
    * 
    * @param args
    *          command-line arguments to parse
@@ -45,8 +52,6 @@ public class BamMergeByScore {
    */
   protected int parseCmdLine(String[] args) {
     int rc = 0;
-    CommandLine cli = null;
-    List<String> inputs = null;
 
     try {
       cli = new DefaultParser().parse(options, args);
@@ -67,8 +72,8 @@ public class BamMergeByScore {
    * tidy up.
    * 
    * @param args
-   *          command-line arguments, pre-parsing
-   * @return zero if successful, non-zero othewise
+   *          command-line arguments, before parsing
+   * @return zero if successful, non-zero otherwise
    */
   protected int run(String[] args) {
     int rc = 0;

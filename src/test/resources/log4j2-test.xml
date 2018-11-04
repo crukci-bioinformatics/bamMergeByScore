@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration>
+  <Appenders>
+    <List name="List">
+      <PatternLayout pattern="xx %d %-5p %c{1} - %m%n"/>
+    </List>
+    <Console name="Console">
+      <PatternLayout pattern="yy %d %-5p %c{1} - %m%n"/>
+    </Console>
+  </Appenders>
+
+  <Loggers>
+    <Logger name="org.cruk.bioinformatics.bamMergeByScore" level="debug" additivity="false">
+      <AppenderRef ref="List"/>
+    </Logger>
+    <Root level="debug">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>
