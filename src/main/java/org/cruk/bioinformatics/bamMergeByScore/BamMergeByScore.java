@@ -29,6 +29,8 @@ public class BamMergeByScore {
   protected Options options = new Options();
   protected CommandLine cli = null;
   protected List<String> inputs = null;
+  protected String mergedOutput = null;
+  protected int primary = -1;
 
   protected void configureOptions() {
     OptionGroup og = new OptionGroup();
@@ -40,14 +42,17 @@ public class BamMergeByScore {
     o = new Option("s", "split", false, "keep output in separate files, named based on input");
     og.addOption(o);
     options.addOptionGroup(og);
+    o = new Option("p", "primary", true, "n'th input file is primary in case of ties (random if not specified)");
+    o.setType(Integer.class);
+    options.addOption(o);
   }
 
   /**
    * Parse the command line, check for at least one input file. Options "--output"
    * and "--split" are mutually exclusive.
    * 
-   * @param args
-   *          command-line arguments to parse
+   * @param args command-line arguments to parse
+   * 
    * @return zero if successful, non-zero otherwise
    */
   protected int parseCmdLine(String[] args) {
@@ -60,6 +65,12 @@ public class BamMergeByScore {
         log.error("Expecting at least one input argument; got {}.", inputs.size());
         rc = -1;
       }
+      if (cli.hasOption("output")) {
+        mergedOutput = cli.getOptionValue("output");
+      }
+      if (cli.hasOption("primary")) {
+        primary = ((Integer) cli.getParsedOptionValue("primary")).intValue();
+      }
     } catch (ParseException pe) {
       log.error("Command line parsing failed: " + pe.toString());
       rc = -1;
@@ -67,18 +78,24 @@ public class BamMergeByScore {
     return rc;
   }
 
+  protected int processFile() {
+    return 0;
+  }
+
   /**
    * Main processing steps: parse the command line, open relevant files, process,
    * tidy up.
    * 
-   * @param args
-   *          command-line arguments, before parsing
+   * @param args command-line arguments, before parsing
    * @return zero if successful, non-zero otherwise
    */
   protected int run(String[] args) {
     int rc = 0;
     configureOptions();
     rc = parseCmdLine(args);
+    if (rc == 0) {
+
+    }
 
     return rc;
   }
@@ -86,8 +103,7 @@ public class BamMergeByScore {
   /**
    * Main entry point to invoke a merge operation.
    * 
-   * @param args
-   *          the command-line arguments
+   * @param args the command-line arguments
    */
   public static void main(String[] args) {
     BamMergeByScore bs = new BamMergeByScore();

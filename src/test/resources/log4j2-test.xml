@@ -3,7 +3,6 @@
 <Configuration>
   <Appenders>
     <List name="List">
-      <PatternLayout pattern="xx %d %-5p %c{1} - %m%n"/>
     </List>
     <Console name="Console">
       <PatternLayout pattern="yy %d %-5p %c{1} - %m%n"/>
