@@ -15,6 +15,7 @@ import org.junit.Test;
 
 public class SampleDataTest {
   protected String sampleData = "src/test/testData/sampleData.bam";
+  protected String bigData = "src/test/testData/testBigBam.bam";
 
   @Test
   public void testSanity() {
@@ -60,4 +61,17 @@ public class SampleDataTest {
     assertEquals(23, data.getScore(readName));
   }
 
+  @Test
+  public void testBigBam() {
+    Path dataP = Paths.get(bigData);
+    SampleData data = new SampleData(dataP);
+    try {
+      data.load();
+    } catch (FileNotFoundException fne) {
+      fail("File not found exception: " + dataP.toString());
+    } catch (IOException io) {
+      fail("IO Exception: " + dataP.toString());
+    }
+    assertEquals(52978679, data.size());
+  }
 }

@@ -2,15 +2,18 @@ package org.cruk.bioinformatics.bamMergeByScore;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.SamReaderFactory;
-import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.ValidationStringency;
+
+import org.apache.commons.collections4.trie.PatriciaTrie;
 
 /**
  * This class holds the data (file name, read scores) from a BAM file. Once a
@@ -47,7 +50,8 @@ class SampleData {
     if (!Files.exists(source)) {
       throw new FileNotFoundException("unable to find " + source.getFileName().toString());
     }
-    SamReader rdr = SamReaderFactory.makeDefault().open(source);
+    SamReaderFactory srf = SamReaderFactory.makeDefault().validationStringency(ValidationStringency.LENIENT);
+    SamReader rdr = srf.open(source);
     header = rdr.getFileHeader();
     for (SAMRecord rec : rdr) {
       String name = rec.getReadName();

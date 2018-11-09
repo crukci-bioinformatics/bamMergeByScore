@@ -43,5 +43,10 @@
       <scope>test</scope>
       <version>2.11.1</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+      <version>4.2</version>
+    </dependency>
   </dependencies>
 </project>
