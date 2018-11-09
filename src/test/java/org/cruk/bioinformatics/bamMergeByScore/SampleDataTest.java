@@ -16,11 +16,12 @@ import org.junit.Test;
 public class SampleDataTest {
   protected String sampleData = "src/test/testData/sampleData.bam";
   protected String bigData = "src/test/testData/testBigBam.bam";
+  protected String reallyBigData = "../bamMerge_testData/testBigBam.bam";
 
   @Test
   public void testSanity() {
     Path dataP = Paths.get(sampleData);
-    SampleData data = new SampleData(dataP);
+    SampleData data = new SampleDataMap(dataP);
     try {
       data.load();
     } catch (FileNotFoundException fne) {
@@ -35,7 +36,7 @@ public class SampleDataTest {
   public void testHasRead() {
     Path dataP = Paths.get(sampleData);
     String readName = "K00252:335:HWMMGBBXX:2:1101:3204:2545";
-    SampleData data = new SampleData(dataP);
+    SampleData data = new SampleDataMap(dataP);
     try {
       data.load();
     } catch (FileNotFoundException fne) {
@@ -50,7 +51,7 @@ public class SampleDataTest {
   public void testReadScore() {
     Path dataP = Paths.get(sampleData);
     String readName = "K00252:335:HWMMGBBXX:2:1101:23815:2527";
-    SampleData data = new SampleData(dataP);
+    SampleData data = new SampleDataMap(dataP);
     try {
       data.load();
     } catch (FileNotFoundException fne) {
@@ -64,7 +65,21 @@ public class SampleDataTest {
   @Test
   public void testBigBam() {
     Path dataP = Paths.get(bigData);
-    SampleData data = new SampleData(dataP);
+    SampleData data = new SampleDataMap(dataP);
+    try {
+      data.load();
+    } catch (FileNotFoundException fne) {
+      fail("File not found exception: " + dataP.toString());
+    } catch (IOException io) {
+      fail("IO Exception: " + dataP.toString());
+    }
+    assertEquals(99928, data.size());
+  }
+
+  @Test
+  public void testBigTrie() {
+    Path dataP = Paths.get(reallyBigData);
+    SampleData data = new SampleDataTrie(dataP);
     try {
       data.load();
     } catch (FileNotFoundException fne) {
@@ -74,4 +89,14 @@ public class SampleDataTest {
     }
     assertEquals(52978679, data.size());
   }
+
+  /*
+   * @Test public void testBigMemory() { Path dataP = Paths.get(bigData);
+   * SampleData data = new SampleDataMap(dataP); try { data.load(); } catch
+   * (FileNotFoundException fne) { fail("File not found exception: " +
+   * dataP.toString()); } catch (IOException io) { fail("IO Exception: " +
+   * dataP.toString()); } long m = data.memory();
+   * System.out.println("object memory: " + m); assertEquals(99928, data.size());
+   * }
+   */
 }

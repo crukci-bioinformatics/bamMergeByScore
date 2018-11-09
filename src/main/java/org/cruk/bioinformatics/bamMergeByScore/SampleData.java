@@ -2,18 +2,9 @@ package org.cruk.bioinformatics.bamMergeByScore;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 import htsjdk.samtools.SAMFileHeader;
-import htsjdk.samtools.SAMRecord;
-import htsjdk.samtools.SamReader;
-import htsjdk.samtools.SamReaderFactory;
-import htsjdk.samtools.ValidationStringency;
-
-import org.apache.commons.collections4.trie.PatriciaTrie;
 
 /**
  * This class holds the data (file name, read scores) from a BAM file. Once a
@@ -25,9 +16,8 @@ import org.apache.commons.collections4.trie.PatriciaTrie;
  * @author Gord Brown
  *
  */
-class SampleData {
+abstract class SampleData {
   protected Path source = null;
-  protected Map<String, Integer> score = new HashMap<String, Integer>();
   protected int entryCount = 0;
   protected SAMFileHeader header = null;
 
@@ -42,35 +32,30 @@ class SampleData {
 
   /**
    * Load the read names and scores for the specified BAM file. Raise exception if
-   * file not found, or read error.
+   * file not found, or read error. Should be instantiated (Map, Trie, etc) by
+   * subclasses.
    * 
    * @return the number of reads loaded.
    */
-  public int load() throws FileNotFoundException, IOException {
-    if (!Files.exists(source)) {
-      throw new FileNotFoundException("unable to find " + source.getFileName().toString());
-    }
-    SamReaderFactory srf = SamReaderFactory.makeDefault().validationStringency(ValidationStringency.LENIENT);
-    SamReader rdr = srf.open(source);
-    header = rdr.getFileHeader();
-    for (SAMRecord rec : rdr) {
-      String name = rec.getReadName();
-      Integer alnScore = rec.getIntegerAttribute("AS");
-      score.put(name, alnScore);
-      entryCount++;
-    }
-    rdr.close();
-    return entryCount;
-  }
+  abstract int load() throws FileNotFoundException, IOException;
 
   /**
    * Return the number of records read.
    * 
    * @return number of records stored
    */
-  public int size() {
+  int size() {
     return entryCount;
   }
+
+  /**
+   * Return the amount of memory used by the object.
+   * 
+   * @return memory used
+   */
+  /*
+   * abstract long memory();
+   */
 
   /**
    * Return the alignment score of the named read.
@@ -78,9 +63,7 @@ class SampleData {
    * @param name the read to find a score for
    * @return the score of the read, or 0 if not found
    */
-  public int getScore(String name) {
-    return score.getOrDefault(name, 0);
-  }
+  abstract int getScore(String name);
 
   /**
    * Report whether the object has a particular read.
@@ -88,9 +71,7 @@ class SampleData {
    * @param name the name of the read to look for
    * @return true if read found, false otherwise
    */
-  public boolean hasRead(String name) {
-    return score.containsKey(name);
-  }
+  abstract boolean hasRead(String name);
 
   /**
    * Return the header of this BAM file.
