@@ -17,8 +17,6 @@ import htsjdk.samtools.SamReader;
 import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.ValidationStringency;
 
-//import org.apache.commons.collections4.trie.PatriciaTrie;
-
 /**
  * This class holds the data (file name, read scores) from a BAM file. Once a
  * file is loaded, this class can be queried to get the score of a given read,

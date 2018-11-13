@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-//import org.hamcrest.CoreMatchers;
 import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -165,6 +163,25 @@ public class SampleDataTest {
       long md = mm.measureDeep(data);
       long c = mm.countChildren(data);
       System.out.println("biggerTrie m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
+    } catch (FileNotFoundException fne) {
+      fail("File not found exception: " + dataP.toString());
+    } catch (IOException io) {
+      fail("IO Exception: " + dataP.toString());
+    }
+    assertEquals(400274, data.size());
+  }
+
+  @Test
+  public void testBiggerBamTrie() {
+    Path dataP = Paths.get(biggerData);
+    SampleData data = new SampleDataBamTrie(dataP);
+    try {
+      MemoryMeter mm = new MemoryMeter();
+      data.load();
+      long m = mm.measure(data);
+      long md = mm.measureDeep(data);
+      long c = mm.countChildren(data);
+      System.out.println("biggerBamTrie m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
     } catch (FileNotFoundException fne) {
       fail("File not found exception: " + dataP.toString());
     } catch (IOException io) {
