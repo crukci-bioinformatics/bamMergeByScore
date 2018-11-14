@@ -7,12 +7,12 @@ import java.nio.file.Path;
 //import java.util.HashMap;
 //import java.util.Map;
 
+import org.apache.commons.collections4.trie.PatriciaTrie;
+
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.ValidationStringency;
-
-import org.apache.commons.collections4.trie.PatriciaTrie;
 
 /**
  * This class holds the data (file name, read scores) from a BAM file. Once a
@@ -21,10 +21,14 @@ import org.apache.commons.collections4.trie.PatriciaTrie;
  * the case of multiple hits within the file, we can select the best score (or a
  * random choice among the best scores).
  * 
+ * NOTA BENE: This data structure does not outperform a built-in Java HashMap.
+ * There is no benefit to using it. (But I had to try it, to find out!)
+ * 
  * @author Gord Brown
  *
  */
 class SampleDataTrie extends SampleData {
+
   protected PatriciaTrie<Integer> score = new PatriciaTrie<Integer>();
 
   /**
@@ -49,7 +53,7 @@ class SampleDataTrie extends SampleData {
     SamReaderFactory srf = SamReaderFactory.makeDefault().validationStringency(ValidationStringency.LENIENT);
     SamReader rdr = srf.open(source);
     header = rdr.getFileHeader();
-    for (SAMRecord rec : rdr) {
+    for (SAMRecord rec: rdr) {
       String name = rec.getReadName();
       Integer alnScore = rec.getIntegerAttribute("AS");
       score.put(name, alnScore);

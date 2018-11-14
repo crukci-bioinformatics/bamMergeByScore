@@ -1,28 +1,32 @@
 package org.cruk.bioinformatics.bamMergeByScore;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.github.jamm.MemoryMeter;
 import org.junit.Test;
 
 public class SampleDataTest {
+
   protected String sampleData = "src/test/testData/sampleData.bam";
   protected String bigData = "src/test/testData/testBigBam.bam";
   protected String biggerData = "src/test/testData/testBiggerBam.bam";
+  protected String oneMData = "src/test/testData/test1M.bam";
+  protected String fiveMData = "src/test/testData/test5M.bam";
   protected String reallyBigData = "../bamMerge_testData/testBigBam.bam";
 
   public static String friendly(long bytes) {
     int unit = 1024;
-    if (bytes < unit) return bytes + " B";
+    if (bytes < unit)
+      return bytes + " B";
     int exp = (int) (Math.log(bytes) / Math.log(unit));
-    String pre = "KMGTPE".charAt(exp-1) + "i";
+    String pre = "KMGTPE".charAt(exp - 1) + "i";
     return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
   }
 
@@ -36,7 +40,7 @@ public class SampleDataTest {
       long m = mm.measure(data);
       long md = mm.measureDeep(data);
       long c = mm.countChildren(data);
-      System.out.println("smallMap m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
+      System.out.println("smallMap m: " + friendly(m) + ", md: " + friendly(md) + " c: " + friendly(c));
     } catch (FileNotFoundException fne) {
       fail("File not found exception: " + dataP.toString());
     } catch (IOException io) {
@@ -75,6 +79,7 @@ public class SampleDataTest {
     assertEquals(23, data.getScore(readName));
   }
 
+  /*
   @Test
   public void testTrie() {
     Path dataP = Paths.get(sampleData);
@@ -94,6 +99,7 @@ public class SampleDataTest {
     }
     assertEquals(1000, data.size());
   }
+  */
 
   @Test
   public void testBigBam() {
@@ -105,7 +111,7 @@ public class SampleDataTest {
       long m = mm.measure(data);
       long md = mm.measureDeep(data);
       long c = mm.countChildren(data);
-      System.out.println("bigMap m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
+      System.out.println("bigMap m: " + friendly(m) + ", md: " + friendly(md) + " c: " + friendly(c));
     } catch (FileNotFoundException fne) {
       fail("File not found exception: " + dataP.toString());
     } catch (IOException io) {
@@ -114,6 +120,7 @@ public class SampleDataTest {
     assertEquals(99928, data.size());
   }
 
+  /*
   @Test
   public void testBigTrie() {
     Path dataP = Paths.get(bigData);
@@ -132,6 +139,7 @@ public class SampleDataTest {
     }
     assertEquals(99928, data.size());
   }
+  */
 
   @Test
   public void testBiggerBam() {
@@ -139,49 +147,14 @@ public class SampleDataTest {
     SampleData data = new SampleDataMap(dataP);
     try {
       MemoryMeter mm = new MemoryMeter();
+      long timeStart = System.nanoTime();
       data.load();
+      long timeEnd = System.nanoTime();
       long m = mm.measure(data);
       long md = mm.measureDeep(data);
       long c = mm.countChildren(data);
-      System.out.println("biggerMap m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
-    } catch (FileNotFoundException fne) {
-      fail("File not found exception: " + dataP.toString());
-    } catch (IOException io) {
-      fail("IO Exception: " + dataP.toString());
-    }
-    assertEquals(400274, data.size());
-  }
-
-  @Test
-  public void testBiggerTrie() {
-    Path dataP = Paths.get(biggerData);
-    SampleData data = new SampleDataTrie(dataP);
-    try {
-      MemoryMeter mm = new MemoryMeter();
-      data.load();
-      long m = mm.measure(data);
-      long md = mm.measureDeep(data);
-      long c = mm.countChildren(data);
-      System.out.println("biggerTrie m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
-    } catch (FileNotFoundException fne) {
-      fail("File not found exception: " + dataP.toString());
-    } catch (IOException io) {
-      fail("IO Exception: " + dataP.toString());
-    }
-    assertEquals(400274, data.size());
-  }
-
-  @Test
-  public void testBiggerBamTrie() {
-    Path dataP = Paths.get(biggerData);
-    SampleData data = new SampleDataBamTrie(dataP);
-    try {
-      MemoryMeter mm = new MemoryMeter();
-      data.load();
-      long m = mm.measure(data);
-      long md = mm.measureDeep(data);
-      long c = mm.countChildren(data);
-      System.out.println("biggerBamTrie m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
+      System.out.println("biggerMap m: " + friendly(m) + ", md: " + friendly(md) + " c: " + friendly(c));
+      System.out.println("time: " + (timeEnd - timeStart) / 1000000);
     } catch (FileNotFoundException fne) {
       fail("File not found exception: " + dataP.toString());
     } catch (IOException io) {
@@ -191,12 +164,74 @@ public class SampleDataTest {
   }
 
   /*
-   * @Test public void testBigMemory() { Path dataP = Paths.get(bigData);
-   * SampleData data = new SampleDataMap(dataP); try { data.load(); } catch
-   * (FileNotFoundException fne) { fail("File not found exception: " +
-   * dataP.toString()); } catch (IOException io) { fail("IO Exception: " +
-   * dataP.toString()); } long m = data.memory();
-   * System.out.println("object memory: " + m); assertEquals(99928, data.size());
-   * }
-   */
+  @Test
+  public void testBiggerTrie() {
+    Path dataP = Paths.get(biggerData);
+    SampleData data = new SampleDataTrie(dataP);
+    try {
+      MemoryMeter mm = new MemoryMeter();
+      long timeStart = System.nanoTime();
+      data.load();
+      long timeEnd = System.nanoTime();
+      long m = mm.measure(data);
+      long md = mm.measureDeep(data);
+      long c = mm.countChildren(data);
+      System.out.println("biggerTrie m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
+      System.out.println("time: "+(timeEnd-timeStart)/1000000);
+    } catch (FileNotFoundException fne) {
+      fail("File not found exception: " + dataP.toString());
+    } catch (IOException io) {
+      fail("IO Exception: " + dataP.toString());
+    }
+    assertEquals(400274, data.size());
+  }
+  */
+
+  /*
+  @Test
+  public void test1MBam() {
+    Path dataP = Paths.get(oneMData);
+    SampleData data = new SampleDataMap(dataP);
+    try {
+      MemoryMeter mm = new MemoryMeter();
+      long timeStart = System.nanoTime();
+      data.load();
+      long timeEnd = System.nanoTime();
+      long m = mm.measure(data);
+      long md = mm.measureDeep(data);
+      long c = mm.countChildren(data);
+      System.out.println("oneMMap m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
+      System.out.println("time: "+(timeEnd-timeStart)/1000000);
+    } catch (FileNotFoundException fne) {
+      fail("File not found exception: " + dataP.toString());
+    } catch (IOException io) {
+      fail("IO Exception: " + dataP.toString());
+    }
+    assertEquals(999928, data.size());
+  }
+  */
+
+  /*
+  @Test
+  public void test5MBam() {
+    Path dataP = Paths.get(fiveMData);
+    SampleData data = new SampleDataMap(dataP);
+    try {
+      MemoryMeter mm = new MemoryMeter();
+      long timeStart = System.nanoTime();
+      data.load();
+      long timeEnd = System.nanoTime();
+      long m = mm.measure(data);
+      long md = mm.measureDeep(data);
+      long c = mm.countChildren(data);
+      System.out.println("fiveMMap m: "+friendly(m)+", md: "+friendly(md)+" c: "+friendly(c));
+      System.out.println("time: "+(timeEnd-timeStart)/1000000);
+    } catch (FileNotFoundException fne) {
+      fail("File not found exception: " + dataP.toString());
+    } catch (IOException io) {
+      fail("IO Exception: " + dataP.toString());
+    }
+    assertEquals(4999928, data.size());
+  }
+  */
 }
