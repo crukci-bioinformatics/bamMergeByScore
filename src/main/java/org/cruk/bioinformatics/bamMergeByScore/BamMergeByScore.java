@@ -21,10 +21,26 @@ import org.apache.logging.log4j.Logger;
  * separate files corresponding with the incoming BAM's, but filtered to remove
  * lower-quality hits.
  * 
+ * To ease space requirements, the package assumes that the files are sorted by
+ * read name. If they are not, the merge will abort and inform the user of the
+ * issue. Experiments with HashMap, tries, and custom-coded tries that take
+ * advantage of the structure of read names revealed that they are too
+ * memory-intensive for use with large BAM files. See classes SampleDataMap,
+ * SampleDataTrie, and SampleDataBamTrie for examples, and SampleDataTest for
+ * test cases.
+ * 
+ * This class will also work for files that have been aligned to the same
+ * reference, but that's not the original purpose. It would be a bit odd to do
+ * this, except possibly if the files were aligned with different alignment
+ * parameters, and later you wanted to keep the best hits from either. If
+ * different sources are aligned to the same reference, then this package is not
+ * appropriate: use "samtools merge" or Picard's equivalent.
+ * 
  * @author Gord Brown
  *
  */
 public class BamMergeByScore {
+
   protected Logger log = LogManager.getLogger(BamMergeByScore.class);
   protected Options options = new Options();
   protected CommandLine cli = null;
@@ -49,7 +65,7 @@ public class BamMergeByScore {
 
   /**
    * Parse the command line, check for at least one input file. Options "--output"
-   * and "--split" are mutually exclusive.
+   * and "--split" are mutually exclusive; one or the other is required, though.
    * 
    * @param args command-line arguments to parse
    * 
@@ -94,7 +110,13 @@ public class BamMergeByScore {
     configureOptions();
     rc = parseCmdLine(args);
     if (rc == 0) {
-
+      // open files, store handles in list
+      // while files are non-empty
+      //   get next read from relevant files (i.e. all with lexicographically lowest
+      //   name)
+      //
+      // What happens if Java's opinion of lexicographic is different from the sort
+      // routine?
     }
 
     return rc;
